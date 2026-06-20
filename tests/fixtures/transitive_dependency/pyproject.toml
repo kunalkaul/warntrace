@@ -1,5 +1,5 @@
 [project]
-name = "transitive-dep"
+name = "transitive_dependency"
 version = "0.1.0"
 description = "Fixture: transitive dependency that emits a warning"
 requires-python = ">=3.10"

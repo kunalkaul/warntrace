@@ -1,9 +1,9 @@
 [project]
-name = "sample-app"
+name = "sample_app"
 version = "0.1.0"
-description = "Fixture: sample app that depends on direct-dep"
+description = "Fixture: sample app that depends on direct_dependency"
 requires-python = ">=3.10"
-dependencies = ["direct-dep"]
+dependencies = ["direct_dependency"]
 
 [build-system]
 requires = ["uv_build>=0.11.22,<0.12.0"]

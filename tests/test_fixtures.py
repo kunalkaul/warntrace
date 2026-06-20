@@ -2,9 +2,12 @@
 
 Requires fixture packages to be installed in the test environment:
 
-    pip install -e tests/fixtures/transitive_dependency
-    pip install -e tests/fixtures/direct_dependency
-    pip install -e tests/fixtures/sample_app
+    uv pip install tests/fixtures/transitive_dependency
+    uv pip install tests/fixtures/direct_dependency
+    uv pip install tests/fixtures/sample_app
+
+Do NOT use ``-e`` (editable) — editable installs hide source files from
+``importlib.metadata``, breaking the distribution index lookup.
 """
 
 from __future__ import annotations
@@ -33,24 +36,28 @@ def _fixtures_installed() -> bool:
 
 pytestmark = pytest.mark.skipif(
     not _fixtures_installed(),
-    reason="Fixture packages not available (run pip install -e tests/fixtures/*)",
+    reason="Fixture packages not available (run uv pip install tests/fixtures/*)",
 )
+
+
+def _run_script(script: str, cwd: Path | None = None) -> subprocess.CompletedProcess:
+    """Run a script file via subprocess, passing sample_app dir as CWD."""
+    return subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=cwd or SAMPLE_APP_DIR,
+        capture_output=True,
+        text=True,
+    )
 
 
 def test_direct_dependency_origin() -> None:
     """A direct dependency warning is classified as DIRECT_DEPENDENCY."""
-    script = (
-        "from warntrace import capture_warnings; "
+    result = _run_script(
+        "import json; from warntrace import WarningTracer; "
         "from direct_dependency import direct_warning; "
-        "with capture_warnings(): direct_warning(); "
-        "r = __import__('warntrace').capture.get_aggregator().build_report(); "
-        "for w in r.warnings: print(w.origin.value, w.category_name)"
-    )
-    result = subprocess.run(
-        [sys.executable, "-c", script],
-        cwd=SAMPLE_APP_DIR,
-        capture_output=True,
-        text=True,
+        "t = WarningTracer(); t.start(); direct_warning(); r = t.stop(); "
+        "data = json.loads(json.dumps(r.to_dict())); "
+        "print(data['warnings'][0]['origin'])"
     )
     assert result.returncode == 0, f"stderr: {result.stderr}"
     assert "direct_dependency" in result.stdout
@@ -58,18 +65,12 @@ def test_direct_dependency_origin() -> None:
 
 def test_transitive_dependency_origin() -> None:
     """A transitive dependency warning is classified as TRANSITIVE_DEPENDENCY."""
-    script = (
-        "from warntrace import capture_warnings; "
+    result = _run_script(
+        "from warntrace import WarningTracer; "
         "from sample_app import run; "
-        "with capture_warnings(): run(); "
-        "r = __import__('warntrace').capture.get_aggregator().build_report(); "
-        "for w in r.warnings: print(w.origin.value, w.category_name)"
-    )
-    result = subprocess.run(
-        [sys.executable, "-c", script],
-        cwd=SAMPLE_APP_DIR,
-        capture_output=True,
-        text=True,
+        "t = WarningTracer(); t.start(); run(); r = t.stop(); "
+        "origins = [w.origin for w in r.warnings]; "
+        "print(','.join(sorted(o.value for o in origins)))"
     )
     assert result.returncode == 0, f"stderr: {result.stderr}"
     assert "direct_dependency" in result.stdout
@@ -78,26 +79,19 @@ def test_transitive_dependency_origin() -> None:
 
 def test_dependency_path_attached() -> None:
     """Dependency warnings have a dependency_path in JSON output."""
-    script = (
-        "from warntrace import capture_warnings; "
+    result = _run_script(
+        "import json; from warntrace import WarningTracer; "
         "from direct_dependency import direct_warning; "
         "from transitive_dependency import transitive_warning; "
-        "with capture_warnings(): direct_warning(); transitive_warning(); "
-        "r = __import__('warntrace').capture.get_aggregator().build_report(); "
-        "print(r.to_json())"
-    )
-    result = subprocess.run(
-        [sys.executable, "-c", script],
-        cwd=SAMPLE_APP_DIR,
-        capture_output=True,
-        text=True,
+        "t = WarningTracer(); t.start(); "
+        "direct_warning(); transitive_warning(); r = t.stop(); "
+        "data = json.loads(json.dumps(r.to_dict())); "
+        "paths = [w.get('dependency_path', []) for w in data['warnings'] "
+        "         if w['origin'] in ('direct_dependency', 'transitive_dependency')]; "
+        "print(all(len(p) > 0 for p in paths))"
     )
     assert result.returncode == 0, f"stderr: {result.stderr}"
-    data = json.loads(result.stdout)
-    for w in data["warnings"]:
-        path = w.get("dependency_path", [])
-        if w["origin"] in ("direct_dependency", "transitive_dependency"):
-            assert len(path) > 0, f"Missing dependency_path for {w['origin']}"
+    assert "True" in result.stdout
 
 
 def test_cli_classifies_fixture_warnings() -> None:

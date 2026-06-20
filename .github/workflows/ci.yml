@@ -35,9 +35,9 @@ jobs:
 
       - name: Install fixture packages
         run: |
-          uv pip install -e tests/fixtures/transitive_dependency
-          uv pip install -e tests/fixtures/direct_dependency
-          uv pip install -e tests/fixtures/sample_app
+          uv pip install tests/fixtures/transitive_dependency
+          uv pip install tests/fixtures/direct_dependency
+          uv pip install tests/fixtures/sample_app
 
       - name: Lint (ruff check)
         run: uv run ruff check .
