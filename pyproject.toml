@@ -1,13 +1,34 @@
 [project]
 name = "warntrace"
-version = "0.1.0"
+version = "0.1.1"
 description = "Find which package caused a Python warning and where your code triggered it."
 readme = "README.md"
 authors = [
     { name = "Kunal Kaul", email = "54585925+kunalkaul@users.noreply.github.com" }
 ]
+license = { file = "LICENSE" }
 requires-python = ">=3.10"
+keywords = ["warnings", "debugging", "cli", "pytest", "testing"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+]
 dependencies = ["packaging>=24"]
+
+[project.urls]
+Homepage = "https://github.com/kunalkaul/warntrace"
+Documentation = "https://github.com/kunalkaul/warntrace#readme"
+Source = "https://github.com/kunalkaul/warntrace"
+Issues = "https://github.com/kunalkaul/warntrace/issues"
 
 [project.scripts]
 warntrace = "warntrace.cli:main"
