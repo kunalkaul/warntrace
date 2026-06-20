@@ -95,7 +95,7 @@ jobs:
       - name: Extract changelog for this version
         run: |
           TAG="${{ github.ref_name }}"
-          awk -v tag="$TAG" 'index($0, "## " tag) == 1{found=NR} found{print} /^## v/{if(found && NR>found) exit}' CHANGELOG.md > release-notes.md
+          awk -v tag="$TAG" 'index($0, "## " tag) == 1{found=NR; print; next} found && /^## v/{exit} found' CHANGELOG.md > release-notes.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

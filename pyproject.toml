@@ -1,6 +1,6 @@
 [project]
 name = "warntrace"
-version = "0.1.0"
+version = "0.1.0.post1"
 description = "Find which package caused a Python warning and where your code triggered it."
 readme = "README.md"
 authors = [

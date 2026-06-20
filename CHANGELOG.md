@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.0.post1 — 2026-06-20
+
+- Fix author email in pyproject.toml.
+
 ## v0.1.0 — 2026-06-20
 
 Initial release of Warntrace — a lightweight CLI and Python library for
