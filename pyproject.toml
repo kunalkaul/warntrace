@@ -1,10 +1,10 @@
 [project]
 name = "warntrace"
-version = "0.1.1"
+version = "0.1.0"
 description = "Find which package caused a Python warning and where your code triggered it."
 readme = "README.md"
 authors = [
-    { name = "Kunal Kaul", email = "54585925+kunalkaul@users.noreply.github.com" }
+    { name = "Kunal Kaul", email = "kkdevcode@gmail.com" }
 ]
 license = { file = "LICENSE" }
 requires-python = ">=3.10"

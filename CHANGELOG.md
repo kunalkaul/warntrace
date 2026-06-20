@@ -1,12 +1,5 @@
 # Changelog
 
-## v0.1.1 — 2026-06-20
-
-- Add `license`, `classifiers`, `keywords`, and `[project.urls]` to
-  pyproject.toml for PyPI sidebar metadata.
-- Fix release body extraction (awk exit-on-match bug). Fixes
-  `softprops/action-gh-release` using only the header line.
-
 ## v0.1.0 — 2026-06-20
 
 Initial release of Warntrace — a lightweight CLI and Python library for
